@@ -13,6 +13,11 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
 
     @IBOutlet weak var map: MKMapView!
         
+    @IBOutlet weak var velocityLabel: UILabel!
+    @IBOutlet weak var latitudeLabel: UILabel!
+    @IBOutlet weak var longitudeLabel: UILabel!
+    @IBOutlet weak var enderecoLabel: UILabel!
+    
     var locationManager = CLLocationManager()
     
     override func viewDidLoad() {
@@ -20,21 +25,42 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
 
         setupLocationManager()
     }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    
+        let userLocation = locations.last
+        
+        let latitude: CLLocationDegrees = (userLocation?.coordinate.latitude)!
+        let longitude: CLLocationDegrees = (userLocation?.coordinate.longitude)!
+        let speed = userLocation?.speed
+        
+        latitudeLabel.text = String(latitude)
+        longitudeLabel.text = String(longitude)
+        velocityLabel.text = String(speed!)
+        
+        let deltaLat: CLLocationDegrees = 0.01
+        let deltaLog: CLLocationDegrees = 0.01
+        
+        let location: CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude, longitude)
+        let area: MKCoordinateSpan = MKCoordinateSpan.init(latitudeDelta: deltaLat, longitudeDelta: deltaLog)
+        let region: MKCoordinateRegion = MKCoordinateRegion.init(center: location, span: area)
+        map.setRegion(region, animated: true)
+    }
 
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         
         if ( status != .authorizedWhenInUse ) {
             
-            var alertController = UIAlertController(title: "Permissão de localização", message: "Necessário permissão para acesso a sua localização", preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Permissão de localização", message: "Necessário permissão para acesso a sua localização", preferredStyle: .alert)
             
-            var actionConfig = UIAlertAction(title: "Abrir configurações", style: .default) { (UIAlertAction) in
+            let actionConfig = UIAlertAction(title: "Abrir configurações", style: .default) { (UIAlertAction) in
                 
                 if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(settingsUrl)
                 }
                 
             }
-            var actionCancel = UIAlertAction(title: "Cancelar", style: .default, handler: nil)
+            let actionCancel = UIAlertAction(title: "Cancelar", style: .default, handler: nil)
             
             alertController.addAction(actionConfig)
             alertController.addAction(actionCancel)
@@ -46,7 +72,6 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     }
     
     
-    
     private func setupLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -54,7 +79,6 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
         locationManager.startUpdatingLocation()
     }
 
-    
     
 }
 
