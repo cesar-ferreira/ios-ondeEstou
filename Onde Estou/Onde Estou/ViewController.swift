@@ -28,15 +28,15 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     
-        let userLocation = locations.last
+        let userLocation: CLLocation = locations.last!
         
-        let latitude: CLLocationDegrees = (userLocation?.coordinate.latitude)!
-        let longitude: CLLocationDegrees = (userLocation?.coordinate.longitude)!
-        let speed = userLocation?.speed
+        let latitude: CLLocationDegrees = (userLocation.coordinate.latitude)
+        let longitude: CLLocationDegrees = (userLocation.coordinate.longitude)
+        let speed = userLocation.speed
         
         latitudeLabel.text = String(latitude)
         longitudeLabel.text = String(longitude)
-        velocityLabel.text = String(speed!)
+        velocityLabel.text = String(speed)
         
         let deltaLat: CLLocationDegrees = 0.01
         let deltaLog: CLLocationDegrees = 0.01
@@ -45,6 +45,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
         let area: MKCoordinateSpan = MKCoordinateSpan.init(latitudeDelta: deltaLat, longitudeDelta: deltaLog)
         let region: MKCoordinateRegion = MKCoordinateRegion.init(center: location, span: area)
         map.setRegion(region, animated: true)
+
     }
 
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
